@@ -2,106 +2,48 @@
 #define VECTOR_H
 
 #include <type_traits>
+#include <cmath>
 
 //Debug
 #include <iostream>
 
-template<typename T, std::enable_if_t<std::is_arithmetic<T>::value, bool> = true>
-struct V3 {
-    T x;
-    T y;
-    T z;
+struct Vec3 {
+    double x, y, z;
 
-    V3() {
-        x = y = z = 0;
+    Vec3(double a, double b, double c) : x(a), y(b), z(c) {};
+
+    inline Vec3 operator+(const Vec3& o) { return Vec3(x + o.x, y + o.y, z + o.z); }
+    inline Vec3 operator-(const Vec3& o) { return Vec3(x - o.x, y - o.y, z - o.z); }
+    inline Vec3 operator*(double m)      { return Vec3(x * m, y * m, z * m); }
+    inline Vec3 operator/(double m)      { return Vec3(x / m, y / m, z / m); }
+
+    double length() {
+        return std::sqrt(x*x + y*y + z*z);
     }
 
-    V3(T a, T b, T c) {
-        x = a;
-        y = b;
-        z = c;
-    }
-
-    V3<T> operator+(const V3<T>& other) {
-        V3<T> ret;
-        ret.x = x + other.x;
-        ret.y = y + other.y;
-        ret.z = z + other.z;
-        return ret;
-    }
-
-    V3<T> operator-(const V3<T>& other) {
-        V3<T> ret;
-        ret.x = x - other.x;
-        ret.y = y - other.y;
-        ret.z = z - other.z;
-        return ret;
-    }
-
-    V3<T> operator*(T m) {
-        V3<T> ret;
-        ret.x = x * m;
-        ret.y = y * m;
-        ret.z = z * m;
-        return ret;
-    }
-
-    V3<T> operator/(T m) {
-        V3<T> ret;
-        ret.x = x / m;
-        ret.y = y / m;
-        ret.z = z / m;
-        return ret;
-    }
-
-    T length() {
-        return x*x + y*y + z*z;
-    }
-
-    V3<T> unit() {
-        V3<T> ret(x,y,z);
-        return ret / ret.length();
+    Vec3 unit() {
+        return (*this) / this->length();
     }
 };
 
-typedef V3<double> Vec3;
-typedef V3<int> Color;
+struct Color {
+    int r, g, b;
 
-double dot(Vec3& a, Vec3& b);
+    Color(double a, double b, double c) : r(a), g(b), b(c) {};
+};
+
+double dot(const Vec3& a, const Vec3& b);
+//Vec3 cross(const Vec3& a, const Vec3& b);
 Color* clamp(Color* c);
 
 struct Ray {
-    Vec3 o; //orientation
-    Vec3 u; //direction
+    Vec3 origin; //origin
+    Vec3 direction; //direction
 
-    Ray(Vec3 a, Vec3 b) {
-        o = a;
-        u = b;
-    }
-};
+    Ray(Vec3 a, Vec3 b) : origin(a), direction(b) {}
 
-
-struct Sphere {
-    Vec3 c; //center
-    double r; //radius
-    Color color;
-
-    Sphere(Vec3 a, double r, Color col) {
-        c = a;
-        r = r;
-        color = col;
-    }
-
-    bool intersect(Ray& y, double& t) {
-        Vec3 L = c - y.o;
-        double tca = dot(L, y.u);
-        double d2 = L.length() - (tca * tca);
-        if (d2 > r*r) { return false; }
-        double thc = std::sqrt((r*r) - d2);
-        double t0 = tca - thc;
-        double t1 = tca + thc;
-        t = std::min(t0, t1);
-        return true;
+    Vec3 at(double t) {
+        return origin + (direction * t);
     }
 };
 

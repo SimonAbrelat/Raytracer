@@ -1,13 +1,24 @@
 #include <algorithm>
 #include "Vector.hpp"
 
-double dot(Vec3& a, Vec3& b) {
-    return (a.x * b.x) + (a.y + b.y) + (a.z + b.z);
+double dot(const Vec3& a, const Vec3& b) {
+    return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
+/*
+Vec3 crossProduct(const Vec3& a, const Vec3& b) {
+   Vec3 ret;
+   ret.x = a.y * b.z - a.z * b.y;
+   ret.y = -(a.x * b.z - a.z * b.x);
+   ret.z = a.x * b.y - a.y * b.x;
+   return ret;
+}
+*/
+
+
 Color* clamp(Color* c) {
-    c->x = std::clamp(c->x, 0, 255);
-    c->y = std::clamp(c->y, 0, 255);
-    c->z = std::clamp(c->z, 0, 255);
+    c->r = std::clamp(c->r, 0, 255);
+    c->g = std::clamp(c->g, 0, 255);
+    c->b = std::clamp(c->b, 0, 255);
     return c;
 }
